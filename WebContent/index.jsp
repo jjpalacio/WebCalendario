@@ -1,5 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
+    
+ 	<%@ page import= 'java.sql.*' %> 
+ 	<%@	page import= 'java.io.*'  %>
+ 	
 <!DOCTYPE html>
 
 <html>
@@ -59,9 +63,39 @@
 		</td>
 		<td>
 			<div id="calendarios">
-			
-				<span class="calendariocol" idcalendario="1" style="width:80px;background:#9fb6ff;">Calendario1</span>
-				<span class="calendariocol" idcalendario="1" style="width:80px;background:#9fb6ff;">Calendario2</span>
+				
+				<%
+				
+					try{
+						String conexion = "jdbc:mysql://localhost:3306/webcalendario";
+						Connection conecction = null;
+						Class.forName("com.mysql.jdbc.Driver").newInstance();
+						conecction = DriverManager.getConnection(conexion, "jjpalacio", "amorpropio");
+						
+						Statement stm = conecction.createStatement();
+						ResultSet rst;
+						
+						String peticion = "Select * from calendarios";
+						
+						rst = stm.executeQuery(peticion);
+						
+						while(rst.next()){
+							
+							out.println("<span class='calendariocol' idcalendario='1' style='width:80px;background:rgb("+rst.getString("color")+");'>"+rst.getString("nombre")+"</span>");
+							
+						} 
+						
+						stm.close();
+						conecction.close();
+					} 
+					catch(Exception ej){
+						
+						out.println(ej.getMessage().toString());
+						
+					}
+				
+				 %> 
+				
 			
 			</div>
 			<span class="calendariocol" style="background:grey;" id="ocultacalendarios"> &gt; </span>
@@ -72,11 +106,43 @@
 		<div id="calendario">
 		
 		<%
-			for (int dia = 1; dia <= 31; dia ++){
-				out.println("<div class='dia ui-droppable' dia='"+dia+"' style='position:relative;'><div class='numerodia'><b>"+dia+"</b></div>"
-						+"<div idcaldia='7' anio='2014' mes='9' dia='13' hora='9' nombre='IMF' class='evento ui-draggable' style='background:#d7d7d7;width:90%;height:19.2%;position:absolute;top:48%;'>9:0-15:00	<span class='motivoevento'>-Evento 1</span><div class='eliminar'><a style='color:#d7d7d7;' href='http://webcalendario.com/php/calendario.php?operacion=eliminar&anio=2014&mes=9&dia=13&nombre=IMF'>X</a></div></div>"		
-				+"</div>");
+			try{
+				String conexion = "jdbc:mysql://localhost:3306/webcalendario";
+				Connection conecction = null;
+				Class.forName("com.mysql.jdbc.Driver").newInstance();
+				conecction = DriverManager.getConnection(conexion, "jjpalacio", "amorpropio");
+				
+				Statement stm = conecction.createStatement();
+				ResultSet rst;
+				
+				for (int dia = 1; dia <= 31; dia ++){
+					
+					String peticion = "SELECT a.*,b.color FROM `eventos` as a inner join `calendarios` as b on a.calendario = b.idcalendario where a.anio = '2021' and a.mes = '04' and dia = "+dia+"";
+					
+					rst = stm.executeQuery(peticion);
+					
+					out.println("<div class='dia ui-droppable' dia='"+dia+"' style='position:relative;'><div class='numerodia'><b>"+dia+"</b></div>");
+					
+					while(rst.next()){
+						
+						out.println("<div idcaldia='7' anio='2014' mes='9' dia='13' hora='9' nombre='IMF' class='evento ui-draggable' style='background:rgb("+rst.getString("color")+");width:90%;height:"+(rst.getInt("duracion")*0.2) +"%;position:absolute;top:"+((rst.getInt("hora")*4)+12)+"%;'>"+rst.getInt("hora")+":"+rst.getInt("minuto")+"-"+(rst.getInt("hora")+(rst.getInt("duracion")/60))+":00	<span class='motivoevento'>-"+rst.getString("nombre")+"</span><div class='eliminar'><a style='color:#d7d7d7;' href='http://webcalendario.com/php/calendario.php?operacion=eliminar&anio=2014&mes=9&dia=13&nombre=IMF'>X</a></div></div>");	
+						
+					}
+						
+					out.println("</div>");
+				}
+				 
+				
+				stm.close();
+				conecction.close();
+			} 
+			catch(Exception ej){
+				
+				out.println(ej.getMessage().toString());
+				
 			}
+		
+			
 		%>
 		
 			<!--  <div class="dia ui-droppable" dia="1" style="position:relative;"><div class="numerodia"><b>1</b></div></div>
