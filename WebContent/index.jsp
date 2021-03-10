@@ -125,7 +125,7 @@
 					
 					while(rst.next()){
 						
-						out.println("<div idcaldia='7' anio='2014' mes='9' dia='13' hora='9' nombre='IMF' class='evento ui-draggable' style='background:rgb("+rst.getString("color")+");width:90%;height:"+(rst.getInt("duracion")*0.2) +"%;position:absolute;top:"+((rst.getInt("hora")*4)+12)+"%;'>"+rst.getInt("hora")+":"+rst.getInt("minuto")+"-"+(rst.getInt("hora")+(rst.getInt("duracion")/60))+":00	<span class='motivoevento'>-"+rst.getString("nombre")+"</span><div class='eliminar'><a style='color:#d7d7d7;' href='http://webcalendario.com/php/calendario.php?operacion=eliminar&anio=2014&mes=9&dia=13&nombre=IMF'>X</a></div></div>");	
+						out.println("<div idcaldia='7' anio='2014' mes='9' dia='13' hora='9' nombre='IMF' class='evento ui-draggable' style='background:rgb("+rst.getString("color")+");width:90%;height:"+(rst.getInt("duracion")*0.2) +"%;position:absolute;top:"+((rst.getInt("hora")*4)+12)+"%;'>"+rst.getInt("hora")+":"+rst.getInt("minuto")+"-"+(rst.getInt("hora")+(rst.getInt("duracion")/60))+":00	<span class='motivoevento'>-"+rst.getString("nombre")+"</span><div class='eliminar'><a style='color:#d7d7d7;' href='acciones/eliminarEvento.jsp?idevento="+rst.getInt("idevento")+"'>X</a></div></div>");	
 						
 					}
 						
@@ -195,9 +195,9 @@
 			<div id="nuevoevento" style="display: none;">
 				<div id="contieneform">
 					<div id="cerrarnuevoevento">X</div>
-					<form action="http://webcalendario.com/jsp/calendario.jsp?evento=nuevo" method="POST">
-					<input type="hidden" name="anio" value="2014">
-						<input type="hidden" name="mes" value="9">
+					<form action="http://localhost:8080/WebCalendario/acciones/nuevoEvento.jsp" method="POST">
+					<input type="hidden" name="anio" value="2021">
+						<input type="hidden" name="mes" value="4">
 						<h3>Nuevo evento</h3>
 					<table width="100%" id="tablanuevoevento" cellpadding="0" cellspacing="0">
 						<tbody><tr>
@@ -205,7 +205,8 @@
 								Año:
 							</td>
 							<td>
-								2014							</td>
+								2121		
+							</td>
 						</tr>
 						<tr>
 							<td>
@@ -228,7 +229,38 @@
 							</td>
 							<td>
 								<select name="calendario">
-								<option value="1">Calendario1</option><option value="2">Calendario2</option>
+								<%
+				
+								try{
+									String conexion = "jdbc:mysql://localhost:3306/webcalendario";
+									Connection conecction = null;
+									Class.forName("com.mysql.jdbc.Driver").newInstance();
+									conecction = DriverManager.getConnection(conexion, "jjpalacio", "amorpropio");
+									
+									Statement stm = conecction.createStatement();
+									ResultSet rst;
+									
+									String peticion = "Select * from calendarios";
+									
+									rst = stm.executeQuery(peticion);
+									
+									while(rst.next()){
+										
+										out.println("<option value='"+rst.getInt("idcalendario")+"'>"+rst.getString("nombre")+"</option>");
+										
+									} 
+									
+									stm.close();
+									conecction.close();
+								} 
+								catch(Exception ej){
+									
+									out.println(ej.getMessage().toString());
+									
+								}
+							
+							 %>
+								
 								</select>
 							</td>
 						</tr>
