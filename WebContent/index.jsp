@@ -4,13 +4,25 @@
  	<%@ page import= 'java.sql.*' %> 
  	<%@	page import= 'java.io.*'  %>
  	
+ 	<%
+ 		if (session.getAttribute("anio") == null){session.setAttribute("anio", 2021);}
+ 		if (session.getAttribute("mes") == null){session.setAttribute("mes", 4);}
+ 		
+ 		int mesnumero = (Integer)session.getAttribute("mes");
+ 		
+ 		if (request.getParameter("mes") != null){
+	 		if (request.getParameter("mes").contains("anterior")){session.setAttribute("mes", mesnumero - 1);}
+	 		if (request.getParameter("mes").contains("siguiente")){session.setAttribute("mes", mesnumero + 1);}
+ 		}
+ 	%>
+ 	
 <!DOCTYPE html>
 
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>
-			Septiembre2014		
+			<%out.println(request.getParameter("mes")+session.getAttribute("mes"));%>		
 		</title>	
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<!--<link rel="shortcut icon" href="http://webcalendario.com/favicons/09.ico">	-->
@@ -56,10 +68,10 @@
 	<table width="100%">
 	<tbody><tr>
 	<td id="aniotitulo">
-		<h2>Septiembre</h2><h1>2014</h1></td>
+		<h2><%out.println(session.getAttribute("mes"));%></h2><h1><%out.println(session.getAttribute("anio"));%></h1></td>
 		<td id="botones">
-			<a href="http://webcalendario.com/"><button> &lt;&lt; </button></a>
-			<a href="./webcalendario_files/webcalendario.html"><button> &gt;&gt; </button></a>
+			<a href="?mes=anterior"><button> &lt;&lt; </button></a>
+			<a href="?mes=siguiente"><button> &gt;&gt; </button></a>
 		</td>
 		<td>
 			<div id="calendarios">
@@ -81,7 +93,7 @@
 						
 						while(rst.next()){
 							
-							out.println("<span class='calendariocol' idcalendario='1' style='width:80px;background:rgb("+rst.getString("color")+");'>"+rst.getString("nombre")+"</span>");
+							out.println("<span class='calendariocol' idcalendario='1' style='width:80px;background:rgb("+rst.getString("color")+");'>"+rst.getString("nombre")+"<div class='eliminar'><a style='color:#d7d7d7;' href='acciones/eliminarCalendario.jsp?idcalendario="+rst.getInt("idcalendario")+"'>X</a></div></span>");
 							
 						} 
 						
@@ -96,7 +108,9 @@
 				
 				 %> 
 				
-			
+			<button id="botonanadircomentario">
+				Añadir comentario
+			</button>
 			</div>
 			<span class="calendariocol" style="background:grey;" id="ocultacalendarios"> &gt; </span>
 			</td>
@@ -117,7 +131,7 @@
 				
 				for (int dia = 1; dia <= 31; dia ++){
 					
-					String peticion = "SELECT a.*,b.color FROM `eventos` as a inner join `calendarios` as b on a.calendario = b.idcalendario where a.anio = '2021' and a.mes = '04' and dia = "+dia+"";
+					String peticion = "SELECT a.*,b.color FROM `eventos` as a inner join `calendarios` as b on a.calendario = b.idcalendario where a.anio = '"+session.getAttribute("anio")+"' and a.mes = '"+session.getAttribute("mes")+"' and dia = "+dia+"";
 					
 					rst = stm.executeQuery(peticion);
 					
@@ -196,8 +210,8 @@
 				<div id="contieneform">
 					<div id="cerrarnuevoevento">X</div>
 					<form action="http://localhost:8080/WebCalendario/acciones/nuevoEvento.jsp" method="POST">
-					<input type="hidden" name="anio" value="2021">
-						<input type="hidden" name="mes" value="4">
+					<input type="hidden" name="anio">
+						<input type="hidden" name="mes">
 						<h3>Nuevo evento</h3>
 					<table width="100%" id="tablanuevoevento" cellpadding="0" cellspacing="0">
 						<tbody><tr>
@@ -317,7 +331,25 @@
 					</tbody></table>	
 				</form>
 			</div>
-		</div>
+			</div>
+			
+			<!--/////// -->
+			<div id="nuevocalendarioform" style="display: none;">
+				<div id="contieneform">
+					<div id="cerrarnuevocalendario">X</div>
+					<form action="http://localhost:8080/WebCalendario/acciones/nuevoCalendario.jsp" method="POST">
+					<input type="hidden" name="anio">
+					<input type="hidden" name="mes">
+						<h3>Nuevo calendario</h3>
+							<input type="text" name="nombrecalendario">
+							<input type="submit" >			
+					</form>
+				</div>
+			</div>
+			
+			
+			<!--/////// -->
+			
 		<div id="ajax"></div>
 	
 </body></html>
